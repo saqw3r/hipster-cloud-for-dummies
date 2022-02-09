@@ -1,19 +1,24 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Hipster.Api
 {
     [ApiController]
-    public class BookController : ControllerBase
+    public class BooksController : ControllerBase
     {
-        [HttpGet("/")]
-        public IActionResult Get()
+        private readonly DataBaseContext _db;
+
+        public BooksController(DataBaseContext db)
         {
-            return Ok(new { 
-                Title = "Lord of the Rings",
-                Author = "J.R.R. Tolkien",
-                Year = "1954",
-                ISBN = "1234567890"
-            });
+            _db = db;
+        }
+
+        [HttpGet("/")]
+        [ProducesResponseType(typeof(Book[]), 200)]
+        public async Task<IActionResult> Get()
+        {
+            var books = await _db.Books.ToArrayAsync();
+            return Ok(books);
         }
     }
 }
